@@ -2,5 +2,6 @@
 *.php
 *.py
 *.sql
-*.css
 *.xml
+*.css
+*.log
