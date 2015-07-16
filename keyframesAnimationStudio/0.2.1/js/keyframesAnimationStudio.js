@@ -1,17 +1,14 @@
 var keyframesAnimationStudio = (function() {
-    var nSteps = 4;
+    var nSteps = 3;
     var currentStep = 0;
-    var mainWindowStatus = 0;
+    var mainWindowStatus = -1;
     var piceWindowStatus = 0;
     var connectionsWindowStatus = 0;
-    var statuses = {};
-    var connStatuses = {};
+    var statuses = [];
     var dragInitialTop = 0;
     var dragInitialLeft = 0;
     var clickedPieceId = "";
     var pieceCounter = 10;
-    var connCounter = 10;
-    
     
     // ------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Windows content
@@ -22,7 +19,7 @@ var keyframesAnimationStudio = (function() {
         if (mainWindowStatus<0){
             content += "==<a class=\"commands switchMainWindow\">(x)</a>==============================\n";
             content += "=                                 =\n";
-            content += "= Keyframes Animation Studio css  =\n";
+            content += "= Keyframes Animation Studio      =\n";
             content += "=                                 =\n";
             content += "===================================\n";
             content += "=                                 =\n";
@@ -35,22 +32,22 @@ var keyframesAnimationStudio = (function() {
         }else if (mainWindowStatus == 0){
             content += "==<a class=\"commands switchMainWindow\">(+)</a>==============================\n";
             content += "=                                 =\n";
-            content += "= Keyframes Animation Studio css  =\n";
+            content += "= Keyframes Animation Studio      =\n";
             content += "=                                 =\n";
         }else{
             content += "==<a class=\"commands switchMainWindow\">(-)</a>==============================\n";
             content += "=                                 =\n";
-            content += "= Keyframes Animation Studio css  =\n";
+            content += "= Keyframes Animation Studio      =\n";
             content += "=                                 =\n";
             content += "===================================\n";
             content += "=                                 =\n";
             content += "= nSteps      :" + pad("   ",nSteps,true) + "        <a class=\"commands lessSteps\">(-)</a> <a class=\"commands moreSteps\">(+)</a> =\n";
             content += "= currentStep :" + pad("   ",currentStep+1,true) + "        <a class=\"commands prevStep\">(-)</a> <a class=\"commands nextStep\">(+)</a> =\n";
             content += "=                                 =\n";
-            content += "= <a class=\"commands help\">help</a> <a class=\"commands twitter popup\" href=\"http://twitter.com/share?text=%40develost_com%20"+"\">tweet</a> <a class=\"commands save\" >save</a> <a class=\"commands load\">load</a> <a class=\"commands reset\">reset</a> <a class=\"commands test\">test</a> =\n";
+            content += "= <a class=\"commands help\">help</a> <a class=\"commands twitter popup\" href=\"http://twitter.com/share?text=%40develost_com%20"+"\">tweet</a> <a class=\"commands save\" >save</a> <a class=\"commands load\" >load</a>            =\n";
             content += "=                                 =\n";
         }
-        content += "=== 0.3.1 by <a  target=\"_blank\" href=\"http://www.develost.com\">develost.com</a> =========";
+        content += "=== 0.2.1 by <a  target=\"_blank\" href=\"http://www.develost.com\">develost.com</a> =========";
         $('#mainWindow').empty().append(content);
     }
 
@@ -112,113 +109,44 @@ var keyframesAnimationStudio = (function() {
                 content += "= Left     :  <input class=\"currentPiece\" size=\"8\" maxLenght=\"8\" type=\"text\" name=\"left\" value=\"" + statuses[pieceId][currentStep]['left'].toFixed(2) + "\"> px         =\n";
                 content += "= Width    :  <input class=\"currentPiece\" size=\"8\" maxLenght=\"8\" type=\"text\" name=\"width\" value=\"" + statuses[pieceId][currentStep]['width'].toFixed(2) + "\"> px         =\n";
                 content += "= Height   :  <input class=\"currentPiece\" size=\"8\" maxLenght=\"8\" type=\"text\" name=\"height\" value=\"" + statuses[pieceId][currentStep]['height'].toFixed(2) + "\"> px         =\n";
-                content += "= Rotation :  " + pad("        ",statuses[pieceId][currentStep]['rotate'].toFixed(2),true) + " deg        =\n";
+                //content += "= Top      :  " + pad("        ",statuses[pieceId][currentStep]['top'].toFixed(2),true) + " px         =\n";
+                //content += "= Left     :  " + pad("        ",statuses[pieceId][currentStep]['left'].toFixed(2),true) + " px         =\n";
+                //content += "= Width    :  " + pad("        ",statuses[pieceId][currentStep]['width'].toFixed(2),true) + " px         =\n";
+                //content += "= Height   :  " + pad("        ",statuses[pieceId][currentStep]['height'].toFixed(2),true) + " px         =\n";
+                content += "= Rotation :  " + pad("        ",statuses[pieceId][currentStep]['rotation'].toFixed(2),true) + " deg        =\n";
                 content += "=                                 =\n";
                 content += "= <a class=\"commands deletePiece\">delete</a>                          =\n";
                 content += "=                                 =\n";
                 content += "===================================\n";
+                
             }
         }
         $('#pieceWindow').empty().append(content);
     }
-    
-    
-    var rerenderAllConnections = function(){
-        $('.conn').each(function () {
-            var connId = $(this).attr('id');
-            var parentId = connStatuses[connId]['parentId'];
-            var vPosType = connStatuses[connId]['vPosType'];
-            var vPosValue = connStatuses[connId]['vPosValue']; 
-            var oPosType =  connStatuses[connId]['oPosType'];
-            var oPosValue = connStatuses[connId]['oPosValue'];
-            var parent = $(this).parent();
-            $(this).remove();
-            
-            var newConn = $("<div></div>");
-            newConn.attr('id',connId);
-            newConn.addClass('conn');
-            var newRotationInverted = 360 - statuses[parentId][currentStep]['rotate'];
-            if (vPosType === 'top'){
-                newConn.css({bottom:'',top:vPosValue});
-            }else{
-                newConn.css({bottom:vPosValue,top:''});
-            }
-            if (oPosType === 'left'){
-                newConn.css({right:'',left:oPosValue});
-            }else{
-                newConn.css({right:oPosValue,left:''});
-            }
-            newConn.addClass("rotate"+newRotationInverted);
-            parent.append(newConn);
-        });
-    
-    
-    }
-    
 
     var renderConnectionsWindow = function(element){
         var content = "";
-        if ((element === null) && (clickedPieceId === "")){
-            if (connectionsWindowStatus == 0) {
-                content += "\n";
-                content += "==<a class=\"commands switchConnectionsWindow\">(+)</a>==============================\n";
-                content += "=                                 =\n";
-                content += "= No connections                  =\n";
-                content += "=                                 =\n";
-                content += "===================================\n";
-            }else{
-                content += "\n";
-                content += "==<a class=\"commands switchConnectionsWindow\">(-)</a>==============================\n";
-                content += "=                                 =\n";
-                content += "= No connections                  =\n";
-                content += "=                                 =\n";
-                content += "===================================\n";
-                content += "=                                 =\n";
-                content += "=                                 =\n";
-                content += "=                                 =\n";
-                content += "=                                 =\n";
-                content += "===================================\n";
-            }
+        
+        if (connectionsWindowStatus == 0) {
+            content += "\n";
+            content += "==<a class=\"commands switchConnectionsWindow\">(+)</a>==============================\n";
+            content += "=                                 =\n";
+            content += "= No connection on current piece  =\n";
+            content += "=                                 =\n";
+            content += "===================================\n";
         }else{
-            var pieceId = null;
-            var mouseStatus = "";
-            if (element === null){
-                pieceId = clickedPieceId;
-            }else{
-                pieceId = $(element).attr('id');
-            }        
-        
-            if (connectionsWindowStatus == 0) {        
-                content += "\n";
-                content += "==<a class=\"commands switchConnectionsWindow\">(+)</a>==============================\n";
-                content += "=                                 =\n";
-                content += "= Connections of "+pad("             ",pieceId)  + "    =\n";
-                content += "=                                 =\n";
-                content += "===================================\n";
-            }else{
-                content += "\n";
-                content += "==<a class=\"commands switchConnectionsWindow\">(-)</a>==============================\n";
-                content += "=                                 =\n";
-                content += "= Connections of "+pad("          ",pieceId)  + "       =\n";
-                content += "=                                 =\n";
-                content += "===================================\n";
-                content += "=                                 =\n";
-                
-                $('.conn').each(function() {
-                    var connId = $(this).attr('id');
-                    if (connStatuses[connId]['parentId'] === pieceId) {
-                        content += "= Id       : "+ pad("         ",connId,true) +" <a class=\"commands deleteConnection\" id=\"del_"+connId+"\">delete</a>     =\n";
-                        content += "= <input class=\"currentConnTypePiece\" size=\"8\" maxLenght=\"8\" type=\"text\" name=\""+connId+"_vPosType\" value=\"" + capitalizeFirstLetter(connStatuses[connId]['vPosType']) + "\" > :  <input class=\"currentConnValuePiece\" size=\"8\" maxLenght=\"8\" type=\"text\" name=\""+connId+"_vPosValue\" value=\"" + connStatuses[connId]['vPosValue'].toFixed(2) + "\"> px         =\n";
-                        content += "= <input class=\"currentConnTypePiece\" size=\"8\" maxLenght=\"8\" type=\"text\" name=\""+connId+"_oPosType\" value=\"" + capitalizeFirstLetter(connStatuses[connId]['oPosType']) + "\" > :  <input class=\"currentConnValuePiece\" size=\"8\" maxLenght=\"8\" type=\"text\" name=\""+connId+"_oPosValue\" value=\"" + connStatuses[connId]['oPosValue'].toFixed(2) + "\"> px         =\n";
-                        content += "=                                 =\n";
-                    }
-                });
-                content += "= <a class=\"commands createConnection\">createNew</a>                       =\n";
-                content += "=                                 =\n";
-                content += "===================================\n";
-            }
+            content += "\n";
+            content += "==<a class=\"commands switchConnectionsWindow\">(-)</a>==============================\n";
+            content += "=                                 =\n";
+            content += "= No connection on current piece  =\n";
+            content += "=                                 =\n";
+            content += "===================================\n";
+            content += "=                                 =\n";
+            content += "= Feature in development.         =\n";
+            content += "= Check back soon.                =\n";
+            content += "=                                 =\n";
+            content += "===================================\n";
         }
-        
         $('#connectionsWindow').empty().append(content);
     }
     
@@ -249,10 +177,6 @@ var keyframesAnimationStudio = (function() {
             return (str + pad).substring(0, pad.length);
        }
     }
-     
-    var  capitalizeFirstLetter = function (string){
-        return string.charAt(0).toUpperCase() + string.slice(1);
-    }
     
     // ------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Functions for pieces
@@ -268,7 +192,7 @@ var keyframesAnimationStudio = (function() {
             }else{
                 deltaRotation = -5;
             }
-            var currentRotation = statuses[pieceId][currentStep]['rotate'];
+            var currentRotation = statuses[pieceId][currentStep]['rotation'];
             var nextRotation = currentRotation + deltaRotation;
             if (nextRotation < 0){
                 nextRotation = 355;
@@ -276,7 +200,7 @@ var keyframesAnimationStudio = (function() {
             if (nextRotation >= 360){
                 nextRotation = 0;
             }
-            statuses[pieceId][currentStep]['rotate'] = nextRotation;
+            statuses[pieceId][currentStep]['rotation'] = nextRotation;
             rerenderPiece(element);
         }
     }
@@ -291,7 +215,7 @@ var keyframesAnimationStudio = (function() {
         var pieceId = $(element).attr('id');
         var newTop = statuses[pieceId][currentStep]['top'];
         var newLeft = statuses[pieceId][currentStep]['left'];
-        var newRotation = statuses[pieceId][currentStep]['rotate'];
+        var newRotation = statuses[pieceId][currentStep]['rotation'];
         var newRotationInverted = 360 - newRotation;
         removeAllRotation(element);
         $(element).offset({top:newTop,left:newLeft});
@@ -306,7 +230,7 @@ var keyframesAnimationStudio = (function() {
         var currentOffset = $(element).offset();
         statuses[pieceId][currentStep]['top'] = /*Math.round(*/currentOffset.top/*)*/;
         statuses[pieceId][currentStep]['left'] = /*Math.round(*/currentOffset.left/*)*/;
-        $(element).addClass("rotate"+statuses[pieceId][currentStep]['rotate']);
+        $(element).addClass("rotate"+statuses[pieceId][currentStep]['rotation']);
         rerenderPiece(element);
     }
     
@@ -386,7 +310,7 @@ var keyframesAnimationStudio = (function() {
             var pieceId = $(this).attr('id');
             removeAllRotation(this);
             $(this).offset({top:statuses[pieceId][currentStep]['top'],left:statuses[pieceId][currentStep]['left']});
-            $(this).addClass("rotate"+statuses[pieceId][currentStep]['rotate'] );
+            $(this).addClass("rotate"+statuses[pieceId][currentStep]['rotation'] );
             $(this).width(statuses[pieceId][currentStep]['width']);
             $(this).height(statuses[pieceId][currentStep]['height']);
         });
@@ -396,17 +320,6 @@ var keyframesAnimationStudio = (function() {
         if (clickedPieceId === ""){
             // nothing to do, should never happen
         }else{
-        
-            // delete every child connection
-            $('.conn').each(function(){
-                var connId = $(this).attr('id');
-                if (clickedPieceId === connStatuses[connId]['parentId']){
-                    delete connStatuses[connId];
-                    $(this).remove();
-                }
-            });
-            
-            // delete piece
             delete statuses[clickedPieceId];
             $('#'+clickedPieceId).remove();
             clickedPieceId = "";
@@ -417,49 +330,19 @@ var keyframesAnimationStudio = (function() {
         pieceCounter++;
         var pieceId = "piece" + (pieceCounter);
         $("#content").append("<div id=\"" + pieceId + "\" class=\"piece\"></div>");
-        var pieceStatuses = {};
+        var pieceStatuses = [];
         for (var i=0;i<nSteps;i++){
-            var currentStatus = {};
+            var currentStatus = [];
             currentStatus['top'] = 100;
             currentStatus['left'] = 100;
             currentStatus['width'] = 400;
             currentStatus['height'] = 200;
-            currentStatus['rotate'] = 0;
+            currentStatus['rotation'] = 0;
             pieceStatuses[i] = currentStatus;
         }
         statuses[pieceId] = pieceStatuses;
         $('.piece').draggable();
         rerenderAllPieces();
-    }
-    
-    var createConnection = function(){
-        if (clickedPieceId === "") {return;}
-        connCounter++;
-        var connId = "conn" + (connCounter);
-        connStatuses[connId] = {};
-        $('.piece').each(function () {
-            var pieceId = $(this).attr('id');
-            if (pieceId === clickedPieceId){
-                var pieceId = $(this).attr("id");
-                var invertedRotation = 360 - statuses[pieceId][currentStep]['rotate'];
-                $(this).append("<div id=\"" + connId + "\" class=\"conn rotate"+invertedRotation+"\"></div>");
-                connStatuses[connId]['parentId'] = pieceId;
-                connStatuses[connId]['vPosType'] = 'top';
-                connStatuses[connId]['vPosValue'] = 50;
-                connStatuses[connId]['oPosType'] = 'left';
-                connStatuses[connId]['oPosValue'] = 50;
-            }
-        });
-        rerenderAllConnections();
-        checkConnect();
-        renderConnectionsWindow(null);
-    }
-    
-    var deleteConnection =  function(element){
-        var actionAndId = $(element).attr('id').split("_");
-        var connId = actionAndId[1];
-        delete connStatuses[connId];
-        $('#'+connId).remove();
     }
     
     // ------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -469,25 +352,14 @@ var keyframesAnimationStudio = (function() {
         $('.piece').each(function () {
             var pieceId = $(this).attr('id');
             var pieceStatuses = statuses[pieceId];
-            var newStatuses = {};
+            var newStatuses = [];
             newStatuses['top'] = pieceStatuses[currentStep]['top'];
             newStatuses['left'] = pieceStatuses[currentStep]['left'];
             newStatuses['width'] = pieceStatuses[currentStep]['width'];
             newStatuses['height'] = pieceStatuses[currentStep]['height'];
-            newStatuses['rotate'] = pieceStatuses[currentStep]['rotate'];
-            var newPieceStatuses = {}
-            
-            var j=0;
-            for (var i=0;i<nSteps;i++){
-                newPieceStatuses[j] = pieceStatuses[i];
-                j++;
-                if (j === currentStep){
-                    newPieceStatuses[j] = newStatuses;
-                    j++;
-                }
-            }
-            //pieceStatuses.splice(currentStep,0,newStatuses);
-            statuses[pieceId] = newPieceStatuses;
+            newStatuses['rotation'] = pieceStatuses[currentStep]['rotation'];
+            pieceStatuses.splice(currentStep,0,newStatuses);
+            statuses[pieceId] = pieceStatuses;
         });
         nSteps++;
     }
@@ -496,17 +368,7 @@ var keyframesAnimationStudio = (function() {
         $('.piece').each(function () {
             var pieceId = $(this).attr('id');
             var pieceStatuses = statuses[pieceId];
-            var j=0;
-            for (var i=0;i<nSteps;i++){
-                if (i===currentStep){
-                    delete pieceStatuses[i];
-                }else{
-                    pieceStatuses[j] = pieceStatuses[i];
-                    j++;
-                }
-            }
-            delete pieceStatuses[nSteps-1];
-            //pieceStatuses.splice(currentStep,1);
+            pieceStatuses.splice(currentStep,1);
             statuses[pieceId] = pieceStatuses;
         });
         nSteps--;
@@ -518,95 +380,18 @@ var keyframesAnimationStudio = (function() {
     var initializeDemoStatuses = function(){
         $('.piece').each(function () {
             var pieceId = $(this).attr('id');
-            var pieceStatuses = {};
+            var pieceStatuses = [];
             for (var i=0;i<nSteps;i++){
-                var currentStatus = {};
+                var currentStatus = [];
                 currentStatus['top'] = 100;
                 currentStatus['left'] = 100;
                 currentStatus['width'] = 400;
                 currentStatus['height'] = 200;
-                currentStatus['rotate'] = 0;
+                currentStatus['rotation'] = 0;
                 pieceStatuses[i] = currentStatus;
             }
             statuses[pieceId] = pieceStatuses;
         });
-        connStatuses['conn0'] = {};
-        connStatuses['conn0']['parentId'] = 'piece0';
-        connStatuses['conn0']['vPosType'] = 'top';
-        connStatuses['conn0']['vPosValue'] = 50;
-        connStatuses['conn0']['oPosType'] = 'left';
-        connStatuses['conn0']['oPosValue'] = 200;
-        
-        connStatuses['conn1'] = {};
-        connStatuses['conn1']['parentId'] = 'piece0';
-        connStatuses['conn1']['vPosType'] = 'top';
-        connStatuses['conn1']['vPosValue'] = 50;
-        connStatuses['conn1']['oPosType'] = 'left';
-        connStatuses['conn1']['oPosValue'] = 50;
-
-        connStatuses['conn2'] = {};
-        connStatuses['conn2']['parentId'] = 'piece0';
-        connStatuses['conn2']['vPosType'] = 'top';
-        connStatuses['conn2']['vPosValue'] = 50;
-        connStatuses['conn2']['oPosType'] = 'right';
-        connStatuses['conn2']['oPosValue'] = 50;
-
-        connStatuses['conn3'] = {};
-        connStatuses['conn3']['parentId'] = 'piece1';
-        connStatuses['conn3']['vPosType'] = 'top';
-        connStatuses['conn3']['vPosValue'] = 50;
-        connStatuses['conn3']['oPosType'] = 'left';
-        connStatuses['conn3']['oPosValue'] = 50;
-
-        connStatuses['conn4'] = {};
-        connStatuses['conn4']['parentId'] = 'piece1';
-        connStatuses['conn4']['vPosType'] = 'top';
-        connStatuses['conn4']['vPosValue'] = 50;
-        connStatuses['conn4']['oPosType'] = 'right';
-        connStatuses['conn4']['oPosValue'] = 50;
-
-        connStatuses['conn5'] = {};
-        connStatuses['conn5']['parentId'] = 'piece2';
-        connStatuses['conn5']['vPosType'] = 'top';
-        connStatuses['conn5']['vPosValue'] = 100;
-        connStatuses['conn5']['oPosType'] = 'left';
-        connStatuses['conn5']['oPosValue'] = 100;
-
-        connStatuses['conn6'] = {};
-        connStatuses['conn6']['parentId'] = 'piece2';
-        connStatuses['conn6']['vPosType'] = 'top';
-        connStatuses['conn6']['vPosValue'] = 100;
-        connStatuses['conn6']['oPosType'] = 'right';
-        connStatuses['conn6']['oPosValue'] = 100;
-
-        connStatuses['conn7'] = {};
-        connStatuses['conn7']['parentId'] = 'piece3';
-        connStatuses['conn7']['vPosType'] = 'top';
-        connStatuses['conn7']['vPosValue'] = 50;
-        connStatuses['conn7']['oPosType'] = 'left';
-        connStatuses['conn7']['oPosValue'] = 50;
-
-        connStatuses['conn8'] = {};
-        connStatuses['conn8']['parentId'] = 'piece3';
-        connStatuses['conn8']['vPosType'] = 'top';
-        connStatuses['conn8']['vPosValue'] = 50;
-        connStatuses['conn8']['oPosType'] = 'right';
-        connStatuses['conn8']['oPosValue'] = 50;
-        
-        connStatuses['conn9'] = {};
-        connStatuses['conn9']['parentId'] = 'piece4';
-        connStatuses['conn9']['vPosType'] = 'top';
-        connStatuses['conn9']['vPosValue'] = 50;
-        connStatuses['conn9']['oPosType'] = 'left';
-        connStatuses['conn9']['oPosValue'] = 50;
-
-        connStatuses['conn10'] = {};
-        connStatuses['conn10']['parentId'] = 'piece4';
-        connStatuses['conn10']['vPosType'] = 'top';
-        connStatuses['conn10']['vPosValue'] = 50;
-        connStatuses['conn10']['oPosType'] = 'right';
-        connStatuses['conn10']['oPosValue'] = 50;
-        
     }
     
     var start = function(){
@@ -617,7 +402,6 @@ var keyframesAnimationStudio = (function() {
         renderConnectionsWindow(null);
         initializeDemoStatuses();
         rerenderAllPieces();
-        rerenderAllConnections();
         checkConnect();
         
         $( document ).delegate( "a.switchMainWindow", "click", function() {
@@ -636,13 +420,11 @@ var keyframesAnimationStudio = (function() {
         
         $( document ).delegate( "div.piece", "mouseover", function(event) {
             renderPieceWindow(this);
-            renderConnectionsWindow(this);
             return false;
         });
 
         $( document ).delegate( "div.piece", "mouseout", function(event) {
             renderPieceWindow(null);
-            renderConnectionsWindow(null);
             return false;
         });          
         
@@ -650,14 +432,12 @@ var keyframesAnimationStudio = (function() {
             rotatePiece(this,event);
             checkConnect();
             renderPieceWindow(this);
-            renderConnectionsWindow(this);
             return false;
         });        
         
         $( document ).delegate( "div.piece", "click", function(event) {
             clickPiece(this);
             renderPieceWindow(this);
-            renderConnectionsWindow(this);
             return false;
         });        
         
@@ -665,7 +445,6 @@ var keyframesAnimationStudio = (function() {
             traslatePiece(this);
             checkConnect();
             renderPieceWindow(this);
-            renderConnectionsWindow(this);
         });
         
         $( document ).delegate( "div.piece", "dragstop", function(event) {
@@ -673,36 +452,19 @@ var keyframesAnimationStudio = (function() {
             rerenderPiece(this);
             checkConnect();
             renderPieceWindow(this);
-            renderConnectionsWindow(this);
         });
 
         
         $( document ).delegate( "a.deletePiece", "click", function() {
             deletePiece();
             renderPieceWindow(null);
-            renderConnectionsWindow(null);
             return false;
         });
-        
-        $( document ).delegate( "a.deleteConnection", "click", function() {
-            deleteConnection(this);
-            rerenderAllConnections();
-            checkConnect();
-            renderConnectionsWindow(null);
-            return false;
-        });        
-        
         
         $( document ).delegate( "a.createPiece", "click", function() {
             createPiece();
             return false;
-        });
-
-
-        $( document ).delegate( "a.createConnection", "click", function() {
-            createConnection();
-            return false;
-        });
+        });        
         
         $( document ).delegate( "a.moreSteps", "click", function() {
             if (confirm("This will create a new step as a copy of step " + (currentStep+1) + ". \nContinue?")){
@@ -711,8 +473,7 @@ var keyframesAnimationStudio = (function() {
                 if (currentStep >= nSteps ){currentStep = 0;}
                 renderMainWindow();
                 rerenderAllPieces();
-                rerenderAllConnections();
-                checkConnect();
+                checkConnect();                
             }
             return false;
         });
@@ -725,7 +486,6 @@ var keyframesAnimationStudio = (function() {
                 if (currentStep >= nSteps ){currentStep = 0;}
                 renderMainWindow();
                 rerenderAllPieces();
-                rerenderAllConnections();
                 checkConnect();                
             }
             return false;
@@ -736,7 +496,6 @@ var keyframesAnimationStudio = (function() {
             if (currentStep < 0 ){currentStep = nSteps-1;}
             renderMainWindow();
             rerenderAllPieces();
-            rerenderAllConnections();
             checkConnect();
             return false;
         });    
@@ -746,7 +505,6 @@ var keyframesAnimationStudio = (function() {
             if (currentStep >= nSteps ){currentStep = 0;}
             renderMainWindow();
             rerenderAllPieces();
-            rerenderAllConnections();
             checkConnect();
             return false;
         });
@@ -767,26 +525,7 @@ var keyframesAnimationStudio = (function() {
         alert("Feature in development.\nCheck back soon.")
         return false;
     });       
-    
-    $( document ).delegate( "a.reset", "click", function() {
-        alert("Feature in development.\nCheck back soon.")
-        return false;
-    });       
 
-    $( document ).delegate( "a.test", "click", function() {
-        var allStatuses = {};
-        allStatuses['pieces'] = statuses;
-        allStatuses['connections'] = connStatuses;
-        var savedStatusJson = JSON.stringify(allStatuses);
-        
-        $("input[name=callType]").val("test");
-        $("input[name=callValue]").val(savedStatusJson);
-        $('#call').submit();
-        
-        alert(savedStatusJson);
-        return false;
-    });     
-    
     
     
     $( document ).delegate( "input.currentPiece", "keypress", function(event) {
@@ -798,70 +537,12 @@ var keyframesAnimationStudio = (function() {
                 var attributeName = $(this).attr('name');
                 statuses[clickedPieceId][currentStep][attributeName] = currentValue;
                 rerenderAllPieces();
-                //rerenderAllConnections();
                 renderPieceWindow(null);
-                renderConnectionsWindow(null);
                 checkConnect();
             }
         }
         return true;
-    });
-    
-    $( document ).delegate( "input.currentConnValuePiece", "keypress", function(event) {
-        if (clickedPieceId === ""){return false;}
-        if(event.which === 13){ // enter key
-            var currentValueString = $(this).val();
-            if (!isNaN(currentValueString)){
-                var currentValue = parseFloat(currentValueString);
-                var attributeName = $(this).attr('name');
-                var idAndValue = attributeName.split("_");
-                var connId = idAndValue[0];
-                var connValue = idAndValue[1];
-                connStatuses[connId][connValue] = currentValue;
-                //rerenderAllPieces();
-                rerenderAllConnections();
-                renderPieceWindow(null);
-                renderConnectionsWindow(null);
-                checkConnect();
-            }
-        }
-        return true;
-    });
-    
-    $( document ).delegate( "input.currentConnTypePiece", "keypress", function(event) {
-        return false;
-    });
-    
-    $( document ).delegate( "input.currentConnTypePiece", "click", function(event) {
-        if (clickedPieceId === ""){return false;}
-
-        var currentValue = $(this).val();
-        var attributeName = $(this).attr('name');
-        var idAndType = attributeName.split("_");
-        var connId = idAndType[0];
-        var connType = idAndType[1];
-        
-        var newValue = "";
-        if (currentValue === "Top"){
-            newValue = "bottom";
-        }else if (currentValue === "Bottom"){
-            newValue = "top";
-        }else if (currentValue === "Left"){
-            newValue = "right";
-        }else if (currentValue === "Right"){
-            newValue = "left";
-        }
-        
-        if (newValue === "") return false;
-        
-        connStatuses[connId][connType] = newValue;
-        //rerenderAllPieces();
-        rerenderAllConnections();
-        renderPieceWindow(null);
-        renderConnectionsWindow(null);
-        checkConnect();
-        return true;    
-    });    
+    });     
     
     $( document ).delegate( "a.popup", "click", function(event) {
         var width  = 575,
@@ -872,7 +553,9 @@ var keyframesAnimationStudio = (function() {
             opts   = 'status=1' + ',width=' + width + ',height=' + height + ',top=' + top + ',left=' + left;
         window.open(url, 'twitter', opts);
         return false;
-      });
+      });    
+    
+    
     
     // ------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public methods
