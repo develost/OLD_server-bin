@@ -58,7 +58,7 @@ var keyframesAnimationStudio = (function() {
             content += "\">tweet</a> <a class=\"commands save\" >save</a> <a class=\"commands load\">load</a>            =\n";
             content += "=                                 =\n";
         }
-        content += "=== 0.6.0 by <a  target=\"_blank\" href=\"http://www.develost.com\">develost.com</a> =========";
+        content += "=== 0.6.1 by <a  target=\"_blank\" href=\"http://www.develost.com\">develost.com</a> =========";
         $('#mainWindow').empty().append(content);
     }
 
@@ -794,7 +794,7 @@ var keyframesAnimationStudio = (function() {
                 clickedPieceId = "";
                 for (key in statuses) {
                     if (statuses.hasOwnProperty(key)) {
-                        alert("crea piece con id"+ key);
+                        //alert("crea piece con id"+ key);
                         $("#content").append("<div id=\"" + key + "\" class=\"piece\"></div>");
                         nSteps = Object.size(statuses[key]);
                         temp = parseInt(key.replace("piece",""));
@@ -819,7 +819,9 @@ var keyframesAnimationStudio = (function() {
                 renderMainWindow();
                 rerenderAllPieces();
                 rerenderAllConnections();
-                checkConnect();                    
+                checkConnect();
+                $('.piece').draggable();
+                alert("Successfully loaded");
             });
         }
         return false;
